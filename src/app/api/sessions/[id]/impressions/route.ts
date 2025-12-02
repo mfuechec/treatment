@@ -5,37 +5,38 @@ import { prisma } from '@/lib/prisma'
 import { z } from 'zod'
 
 // Validation schemas for impression data structures
+// Using lowercase values for consistency across API and frontend
 const concernSchema = z.object({
-  text: z.string(),
-  severity: z.enum(['LOW', 'MODERATE', 'HIGH']),
+  text: z.string().min(1, 'Concern text is required'),
+  severity: z.enum(['low', 'moderate', 'high']),
   excerptIds: z.array(z.string()).optional(),
 })
 
 const highlightSchema = z.object({
-  excerpt: z.string(),
+  excerpt: z.string().min(1, 'Highlight excerpt is required'),
   timestamp: z.string().optional(),
   note: z.string().optional(),
 })
 
 const goalSchema = z.object({
-  text: z.string(),
+  text: z.string().min(1, 'Goal text is required'),
   timeline: z.string().optional(),
   excerptIds: z.array(z.string()).optional(),
 })
 
 const diagnosisSchema = z.object({
-  code: z.string(),
-  description: z.string(),
+  code: z.string().min(1, 'Diagnosis code is required'),
+  description: z.string().min(1, 'Diagnosis description is required'),
 })
 
 const riskObservationSchema = z.object({
-  level: z.enum(['NONE', 'LOW', 'MODERATE', 'HIGH']),
+  level: z.enum(['none', 'low', 'moderate', 'high']),
   notes: z.string().optional(),
   excerptIds: z.array(z.string()).optional(),
 })
 
 const strengthSchema = z.object({
-  text: z.string(),
+  text: z.string().min(1, 'Strength text is required'),
   excerptIds: z.array(z.string()).optional(),
 })
 

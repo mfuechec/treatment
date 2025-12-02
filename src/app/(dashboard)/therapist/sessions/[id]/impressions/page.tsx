@@ -25,6 +25,7 @@ import {
   FileText,
   Sparkles,
 } from "lucide-react"
+import type { Severity, RiskLevel, ImpressionsData } from "@/types/impressions"
 
 interface Session {
   id: string
@@ -37,28 +38,29 @@ interface Session {
   }
 }
 
-interface Concern {
+// Form-specific interfaces with IDs for list management
+interface FormConcern {
   id: string
-  description: string
-  severity: "mild" | "moderate" | "severe"
+  text: string
+  severity: Severity
   excerpts: string[]
 }
 
-interface Highlight {
+interface FormHighlight {
   id: string
   excerpt: string
   note: string
 }
 
-interface Goal {
+interface FormGoal {
   id: string
-  description: string
+  text: string
   timeline: "short" | "long"
 }
 
-interface Strength {
+interface FormStrength {
   id: string
-  description: string
+  text: string
   evidence: string
 }
 
@@ -74,28 +76,28 @@ export default function TherapistImpressionsPage(
   const [error, setError] = useState("")
 
   // Form state
-  const [concerns, setConcerns] = useState<Concern[]>([])
-  const [highlights, setHighlights] = useState<Highlight[]>([])
+  const [concerns, setConcerns] = useState<FormConcern[]>([])
+  const [highlights, setHighlights] = useState<FormHighlight[]>([])
   const [observedThemes, setObservedThemes] = useState<string[]>([])
   const [customThemes, setCustomThemes] = useState<string[]>([])
-  const [goals, setGoals] = useState<Goal[]>([])
+  const [goals, setGoals] = useState<FormGoal[]>([])
   const [diagnosticCodes, setDiagnosticCodes] = useState<string[]>([])
   const [modalities, setModalities] = useState<string[]>([])
-  const [riskLevel, setRiskLevel] = useState<string>("")
-  const [riskEvidence, setRiskEvidence] = useState("")
-  const [strengths, setStrengths] = useState<Strength[]>([])
+  const [riskLevel, setRiskLevel] = useState<RiskLevel>("none")
+  const [riskNotes, setRiskNotes] = useState("")
+  const [strengths, setStrengths] = useState<FormStrength[]>([])
   const [rapportRating, setRapportRating] = useState<number>(3)
   const [engagementRating, setEngagementRating] = useState<number>(3)
   const [resistanceRating, setResistanceRating] = useState<number>(3)
   const [sessionNotes, setSessionNotes] = useState("")
 
   // New concern/highlight/goal form states
-  const [newConcern, setNewConcern] = useState<{ description: string; severity: "mild" | "moderate" | "severe"; excerpt: string }>({ description: "", severity: "moderate", excerpt: "" })
+  const [newConcern, setNewConcern] = useState<{ text: string; severity: Severity; excerpt: string }>({ text: "", severity: "moderate", excerpt: "" })
   const [newHighlight, setNewHighlight] = useState({ excerpt: "", note: "" })
-  const [newGoal, setNewGoal] = useState<{ description: string; timeline: "short" | "long" }>({ description: "", timeline: "short" })
+  const [newGoal, setNewGoal] = useState<{ text: string; timeline: "short" | "long" }>({ text: "", timeline: "short" })
   const [newDiagnosticCode, setNewDiagnosticCode] = useState("")
   const [newCustomTheme, setNewCustomTheme] = useState("")
-  const [newStrength, setNewStrength] = useState({ description: "", evidence: "" })
+  const [newStrength, setNewStrength] = useState({ text: "", evidence: "" })
 
   const commonThemes = [
     "Anxiety",
@@ -139,17 +141,17 @@ export default function TherapistImpressionsPage(
   }, [id])
 
   const addConcern = () => {
-    if (!newConcern.description.trim()) return
+    if (!newConcern.text.trim()) return
     setConcerns([
       ...concerns,
       {
         id: Date.now().toString(),
-        description: newConcern.description,
+        text: newConcern.text,
         severity: newConcern.severity,
         excerpts: newConcern.excerpt ? [newConcern.excerpt] : [],
       },
     ])
-    setNewConcern({ description: "", severity: "moderate", excerpt: "" })
+    setNewConcern({ text: "", severity: "moderate", excerpt: "" })
   }
 
   const removeConcern = (id: string) => {
@@ -174,16 +176,16 @@ export default function TherapistImpressionsPage(
   }
 
   const addGoal = () => {
-    if (!newGoal.description.trim()) return
+    if (!newGoal.text.trim()) return
     setGoals([
       ...goals,
       {
         id: Date.now().toString(),
-        description: newGoal.description,
+        text: newGoal.text,
         timeline: newGoal.timeline,
       },
     ])
-    setNewGoal({ description: "", timeline: "short" })
+    setNewGoal({ text: "", timeline: "short" })
   }
 
   const removeGoal = (id: string) => {
@@ -211,16 +213,16 @@ export default function TherapistImpressionsPage(
   }
 
   const addStrength = () => {
-    if (!newStrength.description.trim()) return
+    if (!newStrength.text.trim()) return
     setStrengths([
       ...strengths,
       {
         id: Date.now().toString(),
-        description: newStrength.description,
+        text: newStrength.text,
         evidence: newStrength.evidence,
       },
     ])
-    setNewStrength({ description: "", evidence: "" })
+    setNewStrength({ text: "", evidence: "" })
   }
 
   const removeStrength = (id: string) => {
@@ -239,59 +241,47 @@ export default function TherapistImpressionsPage(
     )
   }
 
-  const buildImpressionsData = () => {
-    // Map severity values to API expected format
-    const severityMap: Record<string, string> = {
-      mild: "LOW",
-      moderate: "MODERATE",
-      severe: "HIGH",
-    }
-
-    // Map risk level values
-    const riskLevelMap: Record<string, string> = {
-      none: "NONE",
-      low: "LOW",
-      moderate: "MODERATE",
-      high: "HIGH",
-    }
-
+  const buildImpressionsData = (): ImpressionsData => {
+    // Data is now in the correct format - no mapping needed
     return {
       concerns: concerns.map((c) => ({
-        text: c.description,
-        severity: severityMap[c.severity] || "MODERATE",
+        text: c.text,
+        severity: c.severity,
         excerptIds: c.excerpts || [],
       })),
       highlights: highlights.map((h) => ({
         excerpt: h.excerpt,
-        note: h.note,
+        note: h.note || undefined,
       })),
       themes: [...observedThemes, ...customThemes],
       goals: goals.map((g) => ({
-        text: g.description,
+        text: g.text,
         timeline: g.timeline === "short" ? "short-term" : "long-term",
       })),
-      diagnoses: diagnosticCodes.map((code) => {
-        const parts = code.split(" ")
-        return {
-          code: parts[0] || code,
-          description: parts.slice(1).join(" ") || code,
-        }
-      }),
-      modalities: modalities,
+      diagnoses: diagnosticCodes.length > 0
+        ? diagnosticCodes.map((code) => {
+            const parts = code.split(" ")
+            return {
+              code: parts[0] || code,
+              description: parts.slice(1).join(" ") || code,
+            }
+          })
+        : undefined,
+      modalities: modalities.length > 0 ? modalities : undefined,
       riskObservations: {
-        level: riskLevelMap[riskLevel] || "NONE",
-        notes: riskEvidence,
+        level: riskLevel,
+        notes: riskNotes || undefined,
         excerptIds: [],
       },
       strengths: strengths.map((s) => ({
-        text: s.description,
+        text: s.text,
         excerptIds: [],
       })),
       sessionQuality: {
         rapport: rapportRating,
         engagement: engagementRating,
         resistance: resistanceRating,
-        notes: sessionNotes,
+        notes: sessionNotes || undefined,
       },
     }
   }
@@ -415,7 +405,7 @@ export default function TherapistImpressionsPage(
                     <div className="flex items-center gap-2 mb-1">
                       <Badge
                         variant={
-                          concern.severity === "severe"
+                          concern.severity === "high"
                             ? "destructive"
                             : concern.severity === "moderate"
                             ? "default"
@@ -425,7 +415,7 @@ export default function TherapistImpressionsPage(
                         {concern.severity}
                       </Badge>
                     </div>
-                    <p className="font-medium text-gray-900">{concern.description}</p>
+                    <p className="font-medium text-gray-900">{concern.text}</p>
                     {concern.excerpts.length > 0 && (
                       <div className="mt-2 text-sm text-gray-600">
                         {concern.excerpts.map((excerpt, i) => (
@@ -451,14 +441,14 @@ export default function TherapistImpressionsPage(
             <div className="space-y-3 p-4 border-2 border-dashed rounded-lg">
               <Input
                 placeholder="Concern description"
-                value={newConcern.description}
+                value={newConcern.text}
                 onChange={(e) =>
-                  setNewConcern({ ...newConcern, description: e.target.value })
+                  setNewConcern({ ...newConcern, text: e.target.value })
                 }
               />
               <Select
                 value={newConcern.severity}
-                onValueChange={(v: "mild" | "moderate" | "severe") =>
+                onValueChange={(v: Severity) =>
                   setNewConcern({ ...newConcern, severity: v })
                 }
               >
@@ -466,9 +456,9 @@ export default function TherapistImpressionsPage(
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="mild">Mild</SelectItem>
+                  <SelectItem value="low">Low</SelectItem>
                   <SelectItem value="moderate">Moderate</SelectItem>
-                  <SelectItem value="severe">Severe</SelectItem>
+                  <SelectItem value="high">High</SelectItem>
                 </SelectContent>
               </Select>
               <Textarea
@@ -624,7 +614,7 @@ export default function TherapistImpressionsPage(
                   <Badge variant={goal.timeline === "short" ? "default" : "secondary"}>
                     {goal.timeline}-term
                   </Badge>
-                  <p className="mt-2 text-gray-900">{goal.description}</p>
+                  <p className="mt-2 text-gray-900">{goal.text}</p>
                 </div>
                 <Button
                   type="button"
@@ -640,9 +630,9 @@ export default function TherapistImpressionsPage(
             <div className="space-y-3 p-4 border-2 border-dashed rounded-lg">
               <Textarea
                 placeholder="Goal description"
-                value={newGoal.description}
+                value={newGoal.text}
                 onChange={(e) =>
-                  setNewGoal({ ...newGoal, description: e.target.value })
+                  setNewGoal({ ...newGoal, text: e.target.value })
                 }
                 className="min-h-[80px]"
               />
@@ -745,7 +735,7 @@ export default function TherapistImpressionsPage(
           <CardContent className="space-y-4">
             <div className="space-y-3">
               <Label>Risk Level</Label>
-              <RadioGroup value={riskLevel} onValueChange={setRiskLevel}>
+              <RadioGroup value={riskLevel} onValueChange={(v) => setRiskLevel(v as RiskLevel)}>
                 <div className="flex items-center space-x-2">
                   <RadioGroupItem value="none" id="risk-none" />
                   <Label htmlFor="risk-none" className="cursor-pointer">
@@ -778,8 +768,8 @@ export default function TherapistImpressionsPage(
                 <Label>Evidence and Notes</Label>
                 <Textarea
                   placeholder="Describe evidence, protective factors, and any immediate actions taken..."
-                  value={riskEvidence}
-                  onChange={(e) => setRiskEvidence(e.target.value)}
+                  value={riskNotes}
+                  onChange={(e) => setRiskNotes(e.target.value)}
                   className="min-h-[100px]"
                 />
               </div>
@@ -803,7 +793,7 @@ export default function TherapistImpressionsPage(
               >
                 <div className="flex items-start justify-between">
                   <div className="flex-1">
-                    <p className="font-medium text-gray-900">{strength.description}</p>
+                    <p className="font-medium text-gray-900">{strength.text}</p>
                     {strength.evidence && (
                       <p className="text-sm text-gray-600 mt-1">
                         Evidence: {strength.evidence}
@@ -825,9 +815,9 @@ export default function TherapistImpressionsPage(
             <div className="space-y-3 p-4 border-2 border-dashed rounded-lg">
               <Input
                 placeholder="Strength or protective factor"
-                value={newStrength.description}
+                value={newStrength.text}
                 onChange={(e) =>
-                  setNewStrength({ ...newStrength, description: e.target.value })
+                  setNewStrength({ ...newStrength, text: e.target.value })
                 }
               />
               <Textarea
