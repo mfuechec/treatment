@@ -25,6 +25,7 @@ import {
   Clock,
   ExternalLink,
   Upload,
+  Sparkles,
 } from "lucide-react"
 
 interface Session {
@@ -65,6 +66,8 @@ export default function SessionDetailPage(props: PageProps<"/therapist/sessions/
   const [error, setError] = useState("")
   const [searchQuery, setSearchQuery] = useState("")
   const [highlightedTranscript, setHighlightedTranscript] = useState("")
+  const [analyzing, setAnalyzing] = useState(false)
+  const [analyzeError, setAnalyzeError] = useState("")
 
   useEffect(() => {
     const fetchSession = async () => {
@@ -97,6 +100,31 @@ export default function SessionDetailPage(props: PageProps<"/therapist/sessions/
       setHighlightedTranscript(session.transcript)
     }
   }, [searchQuery, session])
+
+  const runAIAnalysis = async () => {
+    if (!session) return
+
+    setAnalyzing(true)
+    setAnalyzeError("")
+
+    try {
+      const response = await fetch(`/api/sessions/${id}/analyze`, {
+        method: "POST",
+      })
+
+      if (!response.ok) {
+        const data = await response.json()
+        throw new Error(data.error || "Failed to run AI analysis")
+      }
+
+      // Redirect to compare view after successful analysis
+      router.push(`/therapist/sessions/${id}/compare`)
+    } catch (err) {
+      setAnalyzeError(err instanceof Error ? err.message : "Failed to run AI analysis")
+    } finally {
+      setAnalyzing(false)
+    }
+  }
 
   const getStatusInfo = () => {
     if (!session) return { label: "Unknown", variant: "secondary" as const, icon: Clock }
@@ -191,6 +219,14 @@ export default function SessionDetailPage(props: PageProps<"/therapist/sessions/
       {/* Risk Alert */}
       {getRiskBadge()}
 
+      {/* Analyze Error Alert */}
+      {analyzeError && (
+        <Alert variant="destructive">
+          <AlertCircle className="h-4 w-4" />
+          <AlertDescription>{analyzeError}</AlertDescription>
+        </Alert>
+      )}
+
       {/* Quick Actions */}
       <Card>
         <CardHeader>
@@ -209,6 +245,27 @@ export default function SessionDetailPage(props: PageProps<"/therapist/sessions/
                 </div>
               </Link>
             </Button>
+
+            {/* Show AI Analysis button when impressions exist but no treatment plan yet */}
+            {session.therapistImpressions && !session.treatmentPlan && (
+              <Button
+                variant="default"
+                className="h-auto py-4"
+                onClick={runAIAnalysis}
+                disabled={analyzing}
+              >
+                <div className="flex flex-col items-center gap-2">
+                  {analyzing ? (
+                    <Loader2 className="h-5 w-5 animate-spin" />
+                  ) : (
+                    <Sparkles className="h-5 w-5" />
+                  )}
+                  <span className="text-sm">
+                    {analyzing ? "Analyzing..." : "Run AI Analysis"}
+                  </span>
+                </div>
+              </Button>
+            )}
 
             {session.treatmentPlan && (
               <>
