@@ -1,0 +1,215 @@
+// Tava Treatment Plan Generator - Prisma Schema
+// Generated from ARCHITECTURE.md specification
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ============================================================================
+// ENUMS
+// ============================================================================
+
+enum Role {
+  THERAPIST
+  CLIENT
+}
+
+enum SessionStatus {
+  TRANSCRIPT_UPLOADED
+  IMPRESSIONS_COMPLETE
+  AI_ANALYZED
+  COMPARISON_READY
+  PLAN_MERGED
+}
+
+enum PlanStatus {
+  DRAFT
+  APPROVED
+}
+
+enum RiskLevel {
+  NONE
+  LOW
+  MODERATE
+  HIGH
+}
+
+// ============================================================================
+// USER & AUTHENTICATION MODELS
+// ============================================================================
+
+model User {
+  id           String   @id @default(cuid())
+  email        String   @unique
+  passwordHash String
+  role         Role
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  therapist     Therapist?
+  client        Client?
+  notifications Notification[]
+}
+
+model Therapist {
+  id            String  @id @default(cuid())
+  userId        String  @unique
+  user          User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  licenseNumber String?
+  specialty     String?
+  preferences   Json?
+
+  clients  Client[]
+  sessions Session[]
+}
+
+model Client {
+  id          String    @id @default(cuid())
+  userId      String    @unique
+  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  therapistId String
+  therapist   Therapist @relation(fields: [therapistId], references: [id])
+  displayName String
+
+  sessions       Session[]
+  treatmentPlans TreatmentPlan[]
+}
+
+// ============================================================================
+// SESSION & WORKFLOW MODELS
+// ============================================================================
+
+model Session {
+  id          String        @id @default(cuid())
+  clientId    String
+  client      Client        @relation(fields: [clientId], references: [id], onDelete: Cascade)
+  therapistId String
+  therapist   Therapist     @relation(fields: [therapistId], references: [id])
+  sessionDate DateTime
+  transcript  String        @db.Text
+  status      SessionStatus @default(TRANSCRIPT_UPLOADED)
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+
+  impressions TherapistImpressions?
+  aiAnalysis  AIAnalysis?
+  summary     SessionSummary?
+  riskFlags   RiskFlag[]
+}
+
+model TherapistImpressions {
+  id               String   @id @default(cuid())
+  sessionId        String   @unique
+  session          Session  @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  concerns         Json // [{text, severity, excerptIds}]
+  highlights       Json // [{excerpt, timestamp, note}]
+  themes           Json // [string]
+  goals            Json // [{text, timeline, excerptIds}]
+  diagnoses        Json? // [{code, description}]
+  modalities       Json? // [string]
+  riskObservations Json // {level, notes, excerptIds}
+  strengths        Json // [{text, excerptIds}]
+  sessionQuality   Json? // {rapport, engagement, resistance, notes}
+  createdAt        DateTime @default(now())
+}
+
+model AIAnalysis {
+  id             String   @id @default(cuid())
+  sessionId      String   @unique
+  session        Session  @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  concerns       Json // [{text, severity, excerptIds}]
+  themes         Json // [string]
+  goals          Json // [{text, timeline, excerptIds}]
+  interventions  Json // [{name, rationale}]
+  homework       Json // [{task, rationale}]
+  strengths      Json // [{text, excerptIds}]
+  riskIndicators Json // [{type, severity, excerpt}]
+  rawOutput      Json // Full GPT response for debugging
+  createdAt      DateTime @default(now())
+}
+
+// ============================================================================
+// TREATMENT PLAN MODELS
+// ============================================================================
+
+model TreatmentPlan {
+  id               String   @id @default(cuid())
+  clientId         String
+  client           Client   @relation(fields: [clientId], references: [id], onDelete: Cascade)
+  currentVersionId String?
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+
+  versions TreatmentPlanVersion[]
+}
+
+model TreatmentPlanVersion {
+  id               String         @id @default(cuid())
+  treatmentPlanId  String
+  treatmentPlan    TreatmentPlan  @relation(fields: [treatmentPlanId], references: [id], onDelete: Cascade)
+  versionNumber    Int
+  sourceSessionId  String
+  therapistContent Json // Clinical view content
+  clientContent    Json? // Plain-language view (null until approved)
+  status           PlanStatus     @default(DRAFT)
+  createdAt        DateTime       @default(now())
+  editedAt         DateTime?
+}
+
+// ============================================================================
+// SUPPORTING MODELS
+// ============================================================================
+
+model SessionSummary {
+  id               String   @id @default(cuid())
+  sessionId        String   @unique
+  session          Session  @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  therapistSummary String   @db.Text
+  clientSummary    String?  @db.Text
+  createdAt        DateTime @default(now())
+}
+
+model RiskFlag {
+  id           String    @id @default(cuid())
+  sessionId    String
+  session      Session   @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  riskType     String // SI, self-harm, harm-to-others, substance, escalation
+  severity     RiskLevel
+  excerpt      String    @db.Text
+  acknowledged Boolean   @default(false)
+  createdAt    DateTime  @default(now())
+}
+
+// ============================================================================
+// NOTIFICATION MODEL
+// ============================================================================
+
+enum NotificationType {
+  SESSION_UPLOADED      // New session transcript uploaded
+  PLAN_GENERATED        // AI generated a treatment plan
+  PLAN_APPROVED         // Treatment plan was approved
+  PLAN_UPDATED          // Treatment plan was updated
+  RISK_FLAG_DETECTED    // High-risk content detected in session
+  NEW_CLIENT            // New client assigned (for therapists)
+}
+
+model Notification {
+  id        String           @id @default(cuid())
+  userId    String
+  user      User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  type      NotificationType
+  title     String
+  message   String
+  link      String?          // Optional link to navigate to
+  read      Boolean          @default(false)
+  createdAt DateTime         @default(now())
+
+  @@index([userId, read])
+  @@index([userId, createdAt])
+}

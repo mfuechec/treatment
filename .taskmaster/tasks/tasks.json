@@ -1,0 +1,758 @@
+{
+  "master": {
+    "tasks": [
+      {
+        "id": "1",
+        "title": "Setup Project Environment",
+        "description": "Initialize the project with Next.js, Prisma, and PostgreSQL.",
+        "details": "Set up a new Next.js project using TypeScript. Configure Prisma ORM with a PostgreSQL database hosted on Railway or Supabase. Ensure the environment is ready for development with all necessary dependencies installed.",
+        "testStrategy": "Verify project setup by running a basic server and connecting to the database. Ensure Prisma migrations are applied successfully.",
+        "priority": "medium",
+        "dependencies": [],
+        "status": "done",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Initialize Next.js Project with TypeScript",
+            "description": "Create a new Next.js project using TypeScript.",
+            "dependencies": [],
+            "details": "Run 'npx create-next-app@latest --typescript' to set up the project.",
+            "status": "pending",
+            "testStrategy": "Verify project structure and TypeScript configuration.",
+            "parentId": "undefined"
+          },
+          {
+            "id": 2,
+            "title": "Install and Configure Prisma ORM",
+            "description": "Set up Prisma ORM for database management.",
+            "dependencies": [
+              1
+            ],
+            "details": "Install Prisma with 'npm install prisma' and initialize with 'npx prisma init'.",
+            "status": "pending",
+            "testStrategy": "Check Prisma setup by running 'npx prisma generate'.",
+            "parentId": "undefined"
+          },
+          {
+            "id": 3,
+            "title": "Set Up PostgreSQL Database on Railway or Supabase",
+            "description": "Create and configure a PostgreSQL database.",
+            "dependencies": [
+              1,
+              2
+            ],
+            "details": "Use Railway or Supabase to host the PostgreSQL database and update the connection string in .env.",
+            "status": "pending",
+            "testStrategy": "Connect to the database using Prisma and verify connection.",
+            "parentId": "undefined"
+          },
+          {
+            "id": 4,
+            "title": "Configure Environment Variables",
+            "description": "Set up environment variables for database connection and other configurations.",
+            "dependencies": [
+              3
+            ],
+            "details": "Add necessary variables to the .env file, including DATABASE_URL for Prisma.",
+            "status": "pending",
+            "testStrategy": "Ensure all environment variables are correctly loaded and accessible.",
+            "parentId": "undefined"
+          },
+          {
+            "id": 5,
+            "title": "Verify Project Setup and Run Basic Server",
+            "description": "Test the initial setup by running the server and checking database connectivity.",
+            "dependencies": [
+              1,
+              2,
+              3,
+              4
+            ],
+            "details": "Run 'npm run dev' to start the server and test database connection with a basic query.",
+            "status": "pending",
+            "testStrategy": "Ensure server runs without errors and database queries execute successfully.",
+            "parentId": "undefined"
+          }
+        ],
+        "updatedAt": "2025-12-01T18:10:09.829Z"
+      },
+      {
+        "id": "2",
+        "title": "Implement User Authentication & Role Management",
+        "description": "Develop a secure authentication system with role-based access for therapists and clients.",
+        "details": "Use NextAuth.js with a credentials provider to handle user authentication. Implement role-based access controls to differentiate between therapist and client dashboards. Ensure secure session management with tokens.",
+        "testStrategy": "Test registration and login flows for both roles. Verify that role-based access controls are enforced on all routes.",
+        "priority": "medium",
+        "dependencies": [
+          "1"
+        ],
+        "status": "done",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Set Up NextAuth.js with Credentials Provider",
+            "description": "Integrate NextAuth.js for user authentication using credentials provider.",
+            "dependencies": [],
+            "details": "Install NextAuth.js and configure it to use a credentials provider for authentication. Set up necessary environment variables and initial configuration files.",
+            "status": "pending",
+            "testStrategy": "Test basic login and logout flows using mock credentials.",
+            "parentId": "undefined"
+          },
+          {
+            "id": 2,
+            "title": "Implement Role-Based Access Controls",
+            "description": "Develop role-based access controls to differentiate between therapist and client dashboards.",
+            "dependencies": [
+              1
+            ],
+            "details": "Define roles and permissions in the application. Implement middleware to check user roles and restrict access to specific routes based on user roles.",
+            "status": "pending",
+            "testStrategy": "Test access restrictions by attempting to access therapist routes as a client and vice versa.",
+            "parentId": "undefined"
+          },
+          {
+            "id": 3,
+            "title": "Develop Therapist Dashboard",
+            "description": "Create a dashboard interface for therapists with role-specific features.",
+            "dependencies": [
+              2
+            ],
+            "details": "Design and implement the therapist dashboard, ensuring it includes all necessary features and data views specific to therapists.",
+            "status": "pending",
+            "testStrategy": "Verify that only users with therapist roles can access the dashboard and that all features are functional.",
+            "parentId": "undefined"
+          },
+          {
+            "id": 4,
+            "title": "Develop Client Dashboard",
+            "description": "Create a dashboard interface for clients with role-specific features.",
+            "dependencies": [
+              2
+            ],
+            "details": "Design and implement the client dashboard, ensuring it includes all necessary features and data views specific to clients.",
+            "status": "pending",
+            "testStrategy": "Verify that only users with client roles can access the dashboard and that all features are functional.",
+            "parentId": "undefined"
+          },
+          {
+            "id": 5,
+            "title": "Ensure Secure Session Management",
+            "description": "Implement secure session management using tokens.",
+            "dependencies": [
+              1
+            ],
+            "details": "Configure NextAuth.js to use secure tokens for session management. Ensure tokens are stored securely and refreshed appropriately.",
+            "status": "pending",
+            "testStrategy": "Test session persistence across different devices and browsers. Verify token expiration and renewal processes.",
+            "parentId": "undefined"
+          }
+        ],
+        "updatedAt": "2025-12-01T18:10:10.953Z"
+      },
+      {
+        "id": "3",
+        "title": "Develop Transcript Input & Session Management",
+        "description": "Create functionality for uploading and managing therapy session transcripts.",
+        "details": "Implement file upload and text paste options for transcripts. Associate each transcript with a specific client and session date. Ensure transcripts are stored securely with encryption at rest.",
+        "testStrategy": "Test file uploads and text pasting for various transcript formats. Verify that transcripts are correctly associated with clients and sessions.",
+        "priority": "medium",
+        "dependencies": [
+          "1",
+          "2"
+        ],
+        "status": "done",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Design Transcript Upload Interface",
+            "description": "Create a user interface for uploading transcripts via file or text input.",
+            "dependencies": [],
+            "details": "Design a simple UI allowing users to upload transcripts either by selecting a file or pasting text directly into a text area.",
+            "status": "pending",
+            "testStrategy": "Test UI with different file types and text inputs.",
+            "parentId": "undefined"
+          },
+          {
+            "id": 2,
+            "title": "Implement File Upload Functionality",
+            "description": "Develop backend logic to handle file uploads securely.",
+            "dependencies": [
+              1
+            ],
+            "details": "Use a secure file handling library to process and store uploaded files. Ensure files are encrypted at rest.",
+            "status": "pending",
+            "testStrategy": "Test file upload with various file sizes and types.",
+            "parentId": "undefined"
+          },
+          {
+            "id": 3,
+            "title": "Develop Text Paste Handling",
+            "description": "Create functionality to process and store pasted transcript text.",
+            "dependencies": [
+              1
+            ],
+            "details": "Implement logic to capture and store text input securely, ensuring encryption at rest.",
+            "status": "pending",
+            "testStrategy": "Test text input with different transcript lengths and formats.",
+            "parentId": "undefined"
+          },
+          {
+            "id": 4,
+            "title": "Associate Transcripts with Clients and Sessions",
+            "description": "Link each transcript to a specific client and session date.",
+            "dependencies": [
+              2,
+              3
+            ],
+            "details": "Develop a database schema to associate transcripts with client IDs and session dates. Ensure data integrity and consistency.",
+            "status": "pending",
+            "testStrategy": "Verify correct association of transcripts with client and session data.",
+            "parentId": "undefined"
+          },
+          {
+            "id": 5,
+            "title": "Ensure Secure Storage of Transcripts",
+            "description": "Implement encryption for stored transcripts to ensure security.",
+            "dependencies": [
+              2,
+              3
+            ],
+            "details": "Use encryption libraries to encrypt transcripts at rest. Ensure compliance with data protection standards.",
+            "status": "pending",
+            "testStrategy": "Test encryption and decryption processes for data integrity.",
+            "parentId": "undefined"
+          }
+        ],
+        "updatedAt": "2025-12-01T18:10:12.016Z"
+      },
+      {
+        "id": "4",
+        "title": "Create Therapist Impressions Input Form",
+        "description": "Develop a form for therapists to input clinical impressions before AI analysis.",
+        "details": "Design a structured form capturing presenting concerns, key highlights, themes, goals, suspected diagnoses, modality considerations, risk observations, strengths, and session quality notes. Ensure impressions are saved and timestamped before AI generation.",
+        "testStrategy": "Test form submission and data persistence. Verify that all fields are captured correctly and that the workflow prevents skipping this step.",
+        "priority": "medium",
+        "dependencies": [
+          "3"
+        ],
+        "status": "done",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Design Form Layout",
+            "description": "Create a layout for the therapist impressions input form.",
+            "dependencies": [],
+            "details": "Design a structured form layout capturing all required fields such as presenting concerns, key highlights, themes, goals, suspected diagnoses, modality considerations, risk observations, strengths, and session quality notes.",
+            "status": "pending",
+            "testStrategy": "Review the form layout to ensure all fields are included and correctly labeled.",
+            "parentId": "undefined"
+          },
+          {
+            "id": 2,
+            "title": "Implement Form Fields",
+            "description": "Develop the input fields for the form based on the design.",
+            "dependencies": [
+              1
+            ],
+            "details": "Implement input fields for each section of the form using appropriate HTML elements. Ensure fields are user-friendly and accessible.",
+            "status": "pending",
+            "testStrategy": "Test each field for correct input handling and accessibility compliance.",
+            "parentId": "undefined"
+          },
+          {
+            "id": 3,
+            "title": "Add Save and Timestamp Functionality",
+            "description": "Ensure that the form data is saved and timestamped before AI generation.",
+            "dependencies": [
+              2
+            ],
+            "details": "Implement functionality to save form data to the database with a timestamp. Ensure data integrity and security.",
+            "status": "pending",
+            "testStrategy": "Test data saving and timestamping by submitting the form and verifying database entries.",
+            "parentId": "undefined"
+          },
+          {
+            "id": 4,
+            "title": "Integrate with AI Analysis Workflow",
+            "description": "Connect the form submission to the AI analysis process.",
+            "dependencies": [
+              3
+            ],
+            "details": "Ensure that the saved impressions are correctly passed to the AI analysis module. Verify the workflow integration.",
+            "status": "pending",
+            "testStrategy": "Test the integration by submitting the form and checking if the data is correctly processed by the AI module.",
+            "parentId": "undefined"
+          },
+          {
+            "id": 5,
+            "title": "Conduct End-to-End Testing",
+            "description": "Perform comprehensive testing of the entire form workflow.",
+            "dependencies": [
+              4
+            ],
+            "details": "Conduct end-to-end testing to ensure the form captures all data correctly, saves it, and integrates with the AI analysis. Verify that no steps can be skipped.",
+            "status": "pending",
+            "testStrategy": "Perform user testing to simulate real-world usage and ensure all functionalities work as expected.",
+            "parentId": "undefined"
+          }
+        ],
+        "updatedAt": "2025-12-01T18:10:13.106Z"
+      },
+      {
+        "id": "5",
+        "title": "Integrate GPT-4 for AI-Powered Treatment Plan Generation",
+        "description": "Set up GPT-4 integration to generate treatment plans from transcripts.",
+        "details": "Use the OpenAI GPT-4 API to parse transcripts and generate structured treatment plans. Ensure the AI operates independently of therapist impressions. Implement error handling and retry logic for API calls.",
+        "testStrategy": "Test AI output for various transcript inputs. Validate JSON schema of AI-generated plans and handle API errors gracefully.",
+        "priority": "medium",
+        "dependencies": [
+          "3",
+          "4"
+        ],
+        "status": "done",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Set Up GPT-4 API Access",
+            "description": "Configure access to the OpenAI GPT-4 API for treatment plan generation.",
+            "dependencies": [
+              3,
+              4
+            ],
+            "details": "Obtain API keys and configure authentication for secure access to the GPT-4 API.",
+            "status": "pending",
+            "testStrategy": "Test API access with a simple request to ensure connectivity.",
+            "parentId": "undefined"
+          },
+          {
+            "id": 2,
+            "title": "Develop Transcript Parsing Module",
+            "description": "Create a module to parse transcripts for input into GPT-4.",
+            "dependencies": [
+              1
+            ],
+            "details": "Implement a parser that extracts relevant information from transcripts for AI processing.",
+            "status": "pending",
+            "testStrategy": "Validate parsing accuracy with sample transcripts.",
+            "parentId": "undefined"
+          },
+          {
+            "id": 3,
+            "title": "Implement Treatment Plan Generation Logic",
+            "description": "Develop logic to generate structured treatment plans using GPT-4.",
+            "dependencies": [
+              2
+            ],
+            "details": "Use the GPT-4 API to generate treatment plans from parsed transcript data.",
+            "status": "pending",
+            "testStrategy": "Test plan generation with various transcript inputs and verify output structure.",
+            "parentId": "undefined"
+          },
+          {
+            "id": 4,
+            "title": "Integrate Error Handling and Retry Logic",
+            "description": "Add error handling and retry mechanisms for API calls.",
+            "dependencies": [
+              3
+            ],
+            "details": "Implement robust error handling and retry logic to manage API call failures.",
+            "status": "pending",
+            "testStrategy": "Simulate API errors and test retry logic effectiveness.",
+            "parentId": "undefined"
+          },
+          {
+            "id": 5,
+            "title": "Validate AI Independence from Therapist Impressions",
+            "description": "Ensure AI-generated plans are independent of therapist input.",
+            "dependencies": [
+              4
+            ],
+            "details": "Verify that the AI operates without bias from therapist impressions, focusing solely on transcript data.",
+            "status": "pending",
+            "testStrategy": "Compare AI outputs with and without therapist impressions to ensure independence.",
+            "parentId": "undefined"
+          }
+        ],
+        "updatedAt": "2025-12-01T18:10:14.234Z"
+      },
+      {
+        "id": "6",
+        "title": "Develop Compare & Merge Workflow",
+        "description": "Implement a side-by-side comparison of therapist impressions and AI analysis.",
+        "details": "Create a UI to display therapist impressions alongside AI output. Highlight alignments and divergences. Allow therapists to merge and edit content from both sources into a final treatment plan.",
+        "testStrategy": "Test the comparison view with various scenarios. Verify that therapists can merge and edit content correctly.",
+        "priority": "medium",
+        "dependencies": [
+          "5"
+        ],
+        "status": "done",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Design UI for Side-by-Side Comparison",
+            "description": "Create a user interface to display therapist impressions alongside AI analysis.",
+            "dependencies": [],
+            "details": "Design the layout to show therapist impressions and AI output side by side, ensuring clear visibility of both.",
+            "status": "pending",
+            "testStrategy": "Verify UI displays both sources correctly.",
+            "parentId": "undefined"
+          },
+          {
+            "id": 2,
+            "title": "Implement Highlighting of Alignments and Divergences",
+            "description": "Develop functionality to highlight alignments and divergences between therapist and AI content.",
+            "dependencies": [
+              1
+            ],
+            "details": "Use color coding to highlight matching and differing sections between the two sources.",
+            "status": "pending",
+            "testStrategy": "Test with sample data to ensure highlights are accurate.",
+            "parentId": "undefined"
+          },
+          {
+            "id": 3,
+            "title": "Enable Content Merging and Editing",
+            "description": "Allow therapists to merge and edit content from both sources into a final treatment plan.",
+            "dependencies": [
+              2
+            ],
+            "details": "Provide editing tools for therapists to combine and modify content from both sources.",
+            "status": "pending",
+            "testStrategy": "Ensure therapists can edit and merge content seamlessly.",
+            "parentId": "undefined"
+          },
+          {
+            "id": 4,
+            "title": "Develop Backend Logic for Content Management",
+            "description": "Create backend logic to handle the storage and retrieval of merged content.",
+            "dependencies": [
+              3
+            ],
+            "details": "Implement APIs to save and retrieve the final treatment plan securely.",
+            "status": "pending",
+            "testStrategy": "Test API endpoints for data integrity and security.",
+            "parentId": "undefined"
+          },
+          {
+            "id": 5,
+            "title": "Conduct User Testing with Therapists",
+            "description": "Perform user testing to gather feedback on the compare and merge workflow.",
+            "dependencies": [
+              4
+            ],
+            "details": "Organize sessions with therapists to test the workflow and gather usability feedback.",
+            "status": "pending",
+            "testStrategy": "Collect feedback and make necessary adjustments based on user input.",
+            "parentId": "undefined"
+          }
+        ],
+        "updatedAt": "2025-12-01T18:10:15.343Z"
+      },
+      {
+        "id": "7",
+        "title": "Generate Dual-View Treatment Plans",
+        "description": "Create therapist-facing and client-facing versions of treatment plans.",
+        "details": "Develop functionality to generate clinical and accessible versions of treatment plans. Ensure the client view is generated from the approved therapist plan and is not visible until therapist approval.",
+        "testStrategy": "Test the generation of both views. Verify readability and accuracy of the client-facing plan.",
+        "priority": "medium",
+        "dependencies": [
+          "6"
+        ],
+        "status": "done",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Design Data Model for Treatment Plans",
+            "description": "Create a data model to support dual-view treatment plans.",
+            "dependencies": [],
+            "details": "Define database schema to store therapist and client versions of treatment plans.",
+            "status": "pending",
+            "testStrategy": "Review schema design with team.",
+            "parentId": "undefined"
+          },
+          {
+            "id": 2,
+            "title": "Develop Therapist Plan Generation",
+            "description": "Implement functionality to generate therapist-facing plans.",
+            "dependencies": [
+              1
+            ],
+            "details": "Create backend logic to generate detailed clinical plans for therapists.",
+            "status": "pending",
+            "testStrategy": "Verify plan generation with sample data.",
+            "parentId": "undefined"
+          },
+          {
+            "id": 3,
+            "title": "Implement Client Plan Generation",
+            "description": "Develop functionality to generate client-facing plans from therapist plans.",
+            "dependencies": [
+              2
+            ],
+            "details": "Ensure client plans are derived from approved therapist plans and are simplified for accessibility.",
+            "status": "pending",
+            "testStrategy": "Test client plan generation for accuracy and readability.",
+            "parentId": "undefined"
+          },
+          {
+            "id": 4,
+            "title": "Create Approval Workflow for Plans",
+            "description": "Develop a workflow for therapists to approve plans before client access.",
+            "dependencies": [
+              3
+            ],
+            "details": "Implement a system where therapists can review and approve plans before they are visible to clients.",
+            "status": "pending",
+            "testStrategy": "Test approval process to ensure only approved plans are visible.",
+            "parentId": "undefined"
+          },
+          {
+            "id": 5,
+            "title": "Integrate Plan Views into System",
+            "description": "Integrate the dual-view plans into the existing system architecture.",
+            "dependencies": [
+              4
+            ],
+            "details": "Ensure seamless integration of both plan views into the application, maintaining role-based access.",
+            "status": "pending",
+            "testStrategy": "Test integration with user roles to verify access control.",
+            "parentId": "undefined"
+          }
+        ],
+        "updatedAt": "2025-12-01T18:10:16.434Z"
+      },
+      {
+        "id": "8",
+        "title": "Build Therapist Dashboard",
+        "description": "Create a central hub for therapists to manage clients, sessions, and plans.",
+        "details": "Develop a dashboard interface for therapists to view client lists, session histories, and treatment plans. Include functionality to upload transcripts and trigger plan generation.",
+        "testStrategy": "Test dashboard navigation and functionality. Verify that all features are accessible and perform as expected.",
+        "priority": "medium",
+        "dependencies": [
+          "2",
+          "3",
+          "7"
+        ],
+        "status": "done",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Design Dashboard Interface",
+            "description": "Create wireframes and design the UI for the therapist dashboard.",
+            "dependencies": [],
+            "details": "Develop wireframes for the dashboard layout, including sections for client lists, session histories, and treatment plans.",
+            "status": "pending",
+            "testStrategy": "Review design with stakeholders for feedback.",
+            "parentId": "undefined"
+          },
+          {
+            "id": 2,
+            "title": "Implement Client List View",
+            "description": "Develop the functionality to display a list of clients on the dashboard.",
+            "dependencies": [
+              1
+            ],
+            "details": "Fetch client data from the database and display it in a sortable and searchable table format.",
+            "status": "pending",
+            "testStrategy": "Test client list display and search functionality.",
+            "parentId": "undefined"
+          },
+          {
+            "id": 3,
+            "title": "Develop Session History Feature",
+            "description": "Create a section to view session histories for each client.",
+            "dependencies": [
+              2
+            ],
+            "details": "Implement a detailed view of past sessions, including dates, notes, and outcomes.",
+            "status": "pending",
+            "testStrategy": "Verify session history accuracy and navigation.",
+            "parentId": "undefined"
+          },
+          {
+            "id": 4,
+            "title": "Add Treatment Plan Management",
+            "description": "Enable therapists to view and manage treatment plans.",
+            "dependencies": [
+              3
+            ],
+            "details": "Integrate treatment plan data and allow for updates and approvals within the dashboard.",
+            "status": "pending",
+            "testStrategy": "Test treatment plan updates and approval workflow.",
+            "parentId": "undefined"
+          },
+          {
+            "id": 5,
+            "title": "Integrate Transcript Upload Functionality",
+            "description": "Allow therapists to upload session transcripts directly from the dashboard.",
+            "dependencies": [
+              4
+            ],
+            "details": "Implement file upload and text paste options, linking transcripts to specific sessions.",
+            "status": "pending",
+            "testStrategy": "Test transcript upload and association with sessions.",
+            "parentId": "undefined"
+          }
+        ],
+        "updatedAt": "2025-12-01T18:10:17.528Z"
+      },
+      {
+        "id": "9",
+        "title": "Build Client Dashboard",
+        "description": "Develop a client-friendly view of treatment plans and progress.",
+        "details": "Create a dashboard for clients to view their treatment plans, goals, and homework. Ensure privacy disclaimers are visible and that clients can only see approved plans.",
+        "testStrategy": "Test client dashboard access and content visibility. Verify that clients can view their plans and progress clearly.",
+        "priority": "medium",
+        "dependencies": [
+          "7"
+        ],
+        "status": "done",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Design Dashboard Layout",
+            "description": "Create a wireframe for the client dashboard layout.",
+            "dependencies": [],
+            "details": "Design a user-friendly layout for displaying treatment plans, goals, and homework.",
+            "status": "pending",
+            "testStrategy": "Review wireframe with stakeholders.",
+            "parentId": "undefined"
+          },
+          {
+            "id": 2,
+            "title": "Implement Treatment Plan Display",
+            "description": "Develop the section to display client treatment plans.",
+            "dependencies": [
+              1
+            ],
+            "details": "Code the UI components to show treatment plans, ensuring only approved plans are visible.",
+            "status": "pending",
+            "testStrategy": "Verify treatment plans display correctly.",
+            "parentId": "undefined"
+          },
+          {
+            "id": 3,
+            "title": "Add Privacy Disclaimers",
+            "description": "Ensure privacy disclaimers are visible on the dashboard.",
+            "dependencies": [
+              1
+            ],
+            "details": "Implement a section for privacy disclaimers, ensuring they are prominent and clear.",
+            "status": "pending",
+            "testStrategy": "Check visibility and clarity of disclaimers.",
+            "parentId": "undefined"
+          },
+          {
+            "id": 4,
+            "title": "Develop Goals and Homework Sections",
+            "description": "Create sections for displaying client goals and homework.",
+            "dependencies": [
+              2
+            ],
+            "details": "Implement UI components to show goals and homework, ensuring data is fetched securely.",
+            "status": "pending",
+            "testStrategy": "Test data retrieval and display for goals and homework.",
+            "parentId": "undefined"
+          },
+          {
+            "id": 5,
+            "title": "Test Client Dashboard Functionality",
+            "description": "Conduct end-to-end testing of the client dashboard.",
+            "dependencies": [
+              2,
+              3,
+              4
+            ],
+            "details": "Perform comprehensive testing to ensure all components function as expected and data is secure.",
+            "status": "pending",
+            "testStrategy": "Test dashboard access, content visibility, and data security.",
+            "parentId": "undefined"
+          }
+        ],
+        "updatedAt": "2025-12-01T18:10:18.629Z"
+      },
+      {
+        "id": "10",
+        "title": "Implement Safety & Crisis Detection",
+        "description": "Develop functionality to flag high-risk language in transcripts.",
+        "details": "Use keyword and phrase pattern matching, followed by GPT-4 contextual analysis, to detect crisis language. Display flags prominently in the therapist view and ensure no concerning content is suppressed.",
+        "testStrategy": "Test detection with various transcript scenarios, including high-risk cases. Verify that flags are accurate and visible to therapists.",
+        "priority": "medium",
+        "dependencies": [
+          "5"
+        ],
+        "status": "done",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Research Keyword and Phrase Patterns",
+            "description": "Identify keywords and phrases indicative of crisis language.",
+            "dependencies": [],
+            "details": "Compile a list of keywords and phrases that are commonly associated with crisis situations. This will serve as the basis for initial pattern matching.",
+            "status": "pending",
+            "testStrategy": "Review and validate the list with subject matter experts.",
+            "parentId": "undefined"
+          },
+          {
+            "id": 2,
+            "title": "Implement Keyword Pattern Matching",
+            "description": "Develop the logic to detect keywords in transcripts.",
+            "dependencies": [
+              1
+            ],
+            "details": "Create a function to scan transcripts for the identified keywords and phrases, flagging any matches for further analysis.",
+            "status": "pending",
+            "testStrategy": "Test with sample transcripts to ensure keywords are detected accurately.",
+            "parentId": "undefined"
+          },
+          {
+            "id": 3,
+            "title": "Integrate GPT-4 for Contextual Analysis",
+            "description": "Use GPT-4 to analyze flagged transcript sections for context.",
+            "dependencies": [
+              2
+            ],
+            "details": "Set up GPT-4 API to analyze sections of transcripts flagged by keyword matching, determining if they truly indicate a crisis.",
+            "status": "pending",
+            "testStrategy": "Test with transcripts containing both crisis and non-crisis language to verify contextual accuracy.",
+            "parentId": "undefined"
+          },
+          {
+            "id": 4,
+            "title": "Develop Therapist View for Flag Display",
+            "description": "Create UI components to display flags in the therapist dashboard.",
+            "dependencies": [
+              3
+            ],
+            "details": "Design and implement UI elements that clearly display flagged sections in the therapist's view, ensuring visibility and clarity.",
+            "status": "pending",
+            "testStrategy": "Conduct user testing with therapists to ensure flags are visible and understandable.",
+            "parentId": "undefined"
+          },
+          {
+            "id": 5,
+            "title": "Ensure No Content Suppression",
+            "description": "Verify that no concerning content is suppressed during analysis.",
+            "dependencies": [
+              4
+            ],
+            "details": "Review the entire detection and display process to ensure all flagged content is presented to therapists without suppression.",
+            "status": "pending",
+            "testStrategy": "Perform end-to-end testing with various transcripts to confirm all flagged content is shown.",
+            "parentId": "undefined"
+          }
+        ],
+        "updatedAt": "2025-12-01T18:10:19.748Z"
+      }
+    ],
+    "metadata": {
+      "version": "1.0.0",
+      "lastModified": "2025-12-01T18:10:19.748Z",
+      "taskCount": 10,
+      "completedCount": 10,
+      "tags": [
+        "master"
+      ]
+    }
+  }
+}
