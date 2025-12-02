@@ -239,25 +239,62 @@ export default function TherapistImpressionsPage(
     )
   }
 
-  const buildImpressionsData = () => ({
-    presentingConcerns: concerns,
-    keyHighlights: highlights,
-    observedThemes: [...observedThemes, ...customThemes],
-    treatmentGoals: goals,
-    diagnosticImpressions: diagnosticCodes,
-    modalityConsiderations: modalities,
-    riskAssessment: {
-      level: riskLevel,
-      evidence: riskEvidence,
-    },
-    clientStrengths: strengths,
-    sessionQuality: {
-      rapport: rapportRating,
-      engagement: engagementRating,
-      resistance: resistanceRating,
-      notes: sessionNotes,
-    },
-  })
+  const buildImpressionsData = () => {
+    // Map severity values to API expected format
+    const severityMap: Record<string, string> = {
+      mild: "LOW",
+      moderate: "MODERATE",
+      severe: "HIGH",
+    }
+
+    // Map risk level values
+    const riskLevelMap: Record<string, string> = {
+      none: "NONE",
+      low: "LOW",
+      moderate: "MODERATE",
+      high: "HIGH",
+    }
+
+    return {
+      concerns: concerns.map((c) => ({
+        text: c.description,
+        severity: severityMap[c.severity] || "MODERATE",
+        excerptIds: c.excerpts || [],
+      })),
+      highlights: highlights.map((h) => ({
+        excerpt: h.excerpt,
+        note: h.note,
+      })),
+      themes: [...observedThemes, ...customThemes],
+      goals: goals.map((g) => ({
+        text: g.description,
+        timeline: g.timeline === "short" ? "short-term" : "long-term",
+      })),
+      diagnoses: diagnosticCodes.map((code) => {
+        const parts = code.split(" ")
+        return {
+          code: parts[0] || code,
+          description: parts.slice(1).join(" ") || code,
+        }
+      }),
+      modalities: modalities,
+      riskObservations: {
+        level: riskLevelMap[riskLevel] || "NONE",
+        notes: riskEvidence,
+        excerptIds: [],
+      },
+      strengths: strengths.map((s) => ({
+        text: s.description,
+        excerptIds: [],
+      })),
+      sessionQuality: {
+        rapport: rapportRating,
+        engagement: engagementRating,
+        resistance: resistanceRating,
+        notes: sessionNotes,
+      },
+    }
+  }
 
   const handleSaveDraft = async () => {
     setIsSavingDraft(true)
