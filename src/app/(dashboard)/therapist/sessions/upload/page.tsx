@@ -140,16 +140,16 @@ export default function TranscriptUploadPage() {
       })
 
       if (!response.ok) {
-        const data = await response.json()
-        throw new Error(data.error || "Failed to upload transcript")
+        const errorData = await response.json()
+        throw new Error(errorData.error || "Failed to upload transcript")
       }
 
-      const session = await response.json()
+      const data = await response.json()
       setSuccess(true)
 
       // Redirect to impressions form after brief success message
       setTimeout(() => {
-        router.push(`/therapist/sessions/${session.id}/impressions`)
+        router.push(`/therapist/sessions/${data.session.id}/impressions`)
       }, 1500)
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to upload transcript")
