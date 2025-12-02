@@ -40,14 +40,14 @@ interface Session {
       email: string
     }
   }
-  therapistImpressions?: {
+  impressions?: {
     id: string
-    riskAssessment: {
+    riskObservations?: {
       level: string
-      evidence?: string
+      notes?: string
     }
-    presentingConcerns: Array<{
-      description: string
+    concerns?: Array<{
+      text: string
       severity: string
     }>
   }
@@ -135,16 +135,16 @@ export default function SessionDetailPage(props: PageProps<"/therapist/sessions/
     if (session.treatmentPlan) {
       return { label: "Plan Generated", variant: "secondary" as const, icon: FileText }
     }
-    if (session.therapistImpressions) {
+    if (session.impressions) {
       return { label: "Impressions Recorded", variant: "secondary" as const, icon: Edit }
     }
     return { label: "Transcript Uploaded", variant: "outline" as const, icon: Upload }
   }
 
   const getRiskBadge = () => {
-    if (!session?.therapistImpressions?.riskAssessment) return null
+    if (!session?.impressions?.riskObservations) return null
 
-    const { level } = session.therapistImpressions.riskAssessment
+    const { level } = session.impressions.riskObservations
     if (level === "none") return null
 
     const variants = {
@@ -163,9 +163,9 @@ export default function SessionDetailPage(props: PageProps<"/therapist/sessions/
         <Icon className="h-4 w-4" />
         <AlertDescription>
           <span className="font-semibold">{level.toUpperCase()} RISK IDENTIFIED</span>
-          {session.therapistImpressions.riskAssessment.evidence && (
+          {session.impressions.riskObservations.notes && (
             <p className="mt-1 text-sm">
-              {session.therapistImpressions.riskAssessment.evidence}
+              {session.impressions.riskObservations.notes}
             </p>
           )}
         </AlertDescription>
@@ -240,14 +240,14 @@ export default function SessionDetailPage(props: PageProps<"/therapist/sessions/
                 <div className="flex flex-col items-center gap-2">
                   <Edit className="h-5 w-5" />
                   <span className="text-sm">
-                    {session.therapistImpressions ? "Edit" : "Add"} Impressions
+                    {session.impressions ? "Edit" : "Add"} Impressions
                   </span>
                 </div>
               </Link>
             </Button>
 
             {/* Show AI Analysis button when impressions exist but no treatment plan yet */}
-            {session.therapistImpressions && !session.treatmentPlan && (
+            {session.impressions && !session.treatmentPlan && (
               <Button
                 variant="default"
                 className="h-auto py-4"
@@ -305,7 +305,7 @@ export default function SessionDetailPage(props: PageProps<"/therapist/sessions/
       <Tabs defaultValue="transcript" className="space-y-4">
         <TabsList>
           <TabsTrigger value="transcript">Transcript</TabsTrigger>
-          <TabsTrigger value="impressions" disabled={!session.therapistImpressions}>
+          <TabsTrigger value="impressions" disabled={!session.impressions}>
             Impressions
           </TabsTrigger>
           <TabsTrigger value="timeline">Timeline</TabsTrigger>
@@ -349,17 +349,17 @@ export default function SessionDetailPage(props: PageProps<"/therapist/sessions/
 
         {/* Impressions Tab */}
         <TabsContent value="impressions">
-          {session.therapistImpressions ? (
+          {session.impressions ? (
             <div className="space-y-4">
               {/* Presenting Concerns */}
-              {Array.isArray(session.therapistImpressions.presentingConcerns) && session.therapistImpressions.presentingConcerns.length > 0 && (
+              {Array.isArray(session.impressions.concerns) && session.impressions.concerns.length > 0 && (
                 <Card>
                   <CardHeader>
                     <CardTitle>Presenting Concerns</CardTitle>
                   </CardHeader>
                   <CardContent>
                     <div className="space-y-3">
-                      {session.therapistImpressions.presentingConcerns.map((concern, idx) => (
+                      {session.impressions.concerns.map((concern, idx) => (
                         <div key={idx} className="flex items-start gap-3">
                           <Badge
                             variant={
@@ -372,7 +372,7 @@ export default function SessionDetailPage(props: PageProps<"/therapist/sessions/
                           >
                             {concern.severity}
                           </Badge>
-                          <p className="text-gray-900">{concern.description}</p>
+                          <p className="text-gray-900">{concern.text}</p>
                         </div>
                       ))}
                     </div>
@@ -381,7 +381,7 @@ export default function SessionDetailPage(props: PageProps<"/therapist/sessions/
               )}
 
               {/* Risk Assessment */}
-              {session.therapistImpressions.riskAssessment.level !== "none" && (
+              {session.impressions.riskObservations && session.impressions.riskObservations.level !== "none" && (
                 <Card>
                   <CardHeader>
                     <CardTitle>Risk Assessment</CardTitle>
@@ -392,19 +392,19 @@ export default function SessionDetailPage(props: PageProps<"/therapist/sessions/
                         <span className="font-medium">Level:</span>
                         <Badge
                           variant={
-                            session.therapistImpressions.riskAssessment.level === "high"
+                            session.impressions.riskObservations.level === "high"
                               ? "destructive"
                               : "default"
                           }
                         >
-                          {session.therapistImpressions.riskAssessment.level}
+                          {session.impressions.riskObservations.level}
                         </Badge>
                       </div>
-                      {session.therapistImpressions.riskAssessment.evidence && (
+                      {session.impressions.riskObservations.notes && (
                         <div>
                           <span className="font-medium">Evidence:</span>
                           <p className="text-gray-700 mt-1">
-                            {session.therapistImpressions.riskAssessment.evidence}
+                            {session.impressions.riskObservations.notes}
                           </p>
                         </div>
                       )}
@@ -467,12 +467,12 @@ export default function SessionDetailPage(props: PageProps<"/therapist/sessions/
                   <div className="flex flex-col items-center">
                     <div
                       className={`rounded-full p-2 ${
-                        session.therapistImpressions
+                        session.impressions
                           ? "bg-green-100"
                           : "bg-gray-100"
                       }`}
                     >
-                      {session.therapistImpressions ? (
+                      {session.impressions ? (
                         <CheckCircle2 className="h-5 w-5 text-green-600" />
                       ) : (
                         <Clock className="h-5 w-5 text-gray-400" />
@@ -483,7 +483,7 @@ export default function SessionDetailPage(props: PageProps<"/therapist/sessions/
                   <div className="pb-6">
                     <p className="font-medium">Therapist Impressions</p>
                     <p className="text-sm text-gray-500">
-                      {session.therapistImpressions
+                      {session.impressions
                         ? "Completed"
                         : "Not started"}
                     </p>
